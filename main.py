@@ -41,7 +41,8 @@ class Zombie:
             print(f'Round: {game_round} .................')
             print(f'State at start: {zombie}')
             zombie.move()
-            print(f'State at  end: {zombie}')            
+            print(f'State at   end: {zombie}')   
+            game_round += 1         
 
 # Start by tracking game as global variables. Later probably a good idea to create a Game class
 
