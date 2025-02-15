@@ -12,6 +12,7 @@ This version doesn't make use of the return values of move or hit_arrows. It jus
 
 This version doesn't allocate arrows to the most urgent zombie targets. It just shoots x arrows at every zombie.
 
+** Added a MAX_ROUNDS = 50 setting to prevent an infinite game. In prior version, the no arrows game terminates (player eaten) but the other game never ends ... new live zombies appear in every round, alongside other live zombies.
 '''
 
 class Zombie:
@@ -55,15 +56,16 @@ class Zombie:
         return new_zombie
 
     @classmethod
-    def TESTME(cls, arrows_per_zombie = 0):
+    def TESTME(cls, arrows_per_zombie = 0, MAX_ROUNDS = 10):
         '''Creates some Zombies. At each round, the zombies move. Ends when a zombie's distance reaches 0.
         No arrows yet, so zombies just keep advancing!! We expect Chuck to win the race given his initial distance (20) and speed (8).
         Round 1: Chuck starts d=20, ends d=12; Round 2: Chuck d=12 drops to d=4; Round 3: Chuck reaches d=0; Game stops.
         
         Adding poor version of random zombies ... presently they're all the same, named "Zack".
+                
         '''
 
-        # Initialize Game by creating zombies, setting round = 1
+        # Initialize Game by creating zombies, setting round = 1, setting MAX_ROUNDS 
         game_round = 1
         zombies = [Zombie("Abe", 10, 1, 5), Zombie("Bill", 200, 40, 20), Zombie("Chuck", 20, 8, 10)]
         for zombie in zombies:
@@ -75,7 +77,7 @@ class Zombie:
         numb_live_zombies = sum(z.alive for z in zombies) 
         min_distance = min(z.distance for z in zombies)
 
-        while (min_distance > 0) and (numb_live_zombies > 0):
+        while (min_distance > 0) and (numb_live_zombies > 0) and (game_round <= MAX_ROUNDS):
             print(f'Round: {game_round} ........................................')
 
             # Generate more zombies ...
@@ -109,10 +111,13 @@ class Zombie:
             numb_live_zombies = sum(z.alive for z in zombies) 
  
             # If all zombies are dead, player survived; otherwise rounds halted when a zombie's distance closed to zero.
-        if numb_live_zombies > 0:
+        if game_round >= MAX_ROUNDS:
+            print("\nYou survived {MAX_ROUNDS} rounds, time is up.\n")
+        elif numb_live_zombies > 0:
             print(f'\nYou are dead, eaten by {[z.name for z in zombies if (z.alive and not(z.distance))]}!\n')
         else:
-            print("\nYou survived!\n")
+            print("\nYou survived, all zombies are terminated!\n")
+
 
 # Start by tracking game as global variables. Later probably a good idea to create a Game class
 
