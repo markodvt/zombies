@@ -1,3 +1,5 @@
+import random
+
 '''Defines a class Zombie that does the following:
 - tracks zombie's state (name, distance, speed, health, rounds until killed, alive=T or F)
 - moves a zombie (returning it's remaining distance after the move)
@@ -9,13 +11,11 @@ This version lacks any class or encapsulation of the actual Game.
 This version doesn't make use of the return values of move or hit_arrows. It just updates zombie state for every zombie, and then updates the global game variables after each round.
 
 This version doesn't allocate arrows to the most urgent zombie targets. It just shoots x arrows at every zombie.
+
 '''
 
-
-
-
 class Zombie:
-    def __init__(self, name, distance, speed, health, rounds=0):
+    def __init__(self, name, distance, speed, health, rounds=1):
         self.name = name
         self.distance = distance
         self.speed = speed
@@ -102,12 +102,15 @@ class Zombie:
 # Start by tracking game as global variables. Later probably a good idea to create a Game class
 
 def main():
+    print([random.randint(1, 10) for i in range(20)])
+    
+    '''
     print("Run a test game with no arrows ... expect to die.\n\n")
     Zombie.TESTME(arrows_per_zombie=0)
 
     print("\n\nRun a test game with 10 arrows at each zombie per round ... expect to live.\n\n")
     Zombie.TESTME(arrows_per_zombie=10)
-
+    '''
 
 if __name__ == "__main__":
     main()
