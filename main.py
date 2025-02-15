@@ -47,10 +47,20 @@ class Zombie:
         return self.health
 
     @classmethod
-    def TESTME(self, arrows_per_zombie = 0):
+    def generate_random(cls):
+        '''TODO - make this random. Starting with simple, static constructor.
+        '''
+        inputs = ('Zack', 100, 10, 50)
+        new_zombie = Zombie(*inputs)
+        return new_zombie
+
+    @classmethod
+    def TESTME(cls, arrows_per_zombie = 0):
         '''Creates some Zombies. At each round, the zombies move. Ends when a zombie's distance reaches 0.
         No arrows yet, so zombies just keep advancing!! We expect Chuck to win the race given his initial distance (20) and speed (8).
         Round 1: Chuck starts d=20, ends d=12; Round 2: Chuck d=12 drops to d=4; Round 3: Chuck reaches d=0; Game stops.
+        
+        Adding poor version of random zombies ... presently they're all the same, named "Zack".
         '''
 
         # Initialize Game by creating zombies, setting round = 1
@@ -67,6 +77,11 @@ class Zombie:
 
         while (min_distance > 0) and (numb_live_zombies > 0):
             print(f'Round: {game_round} ........................................')
+
+            # Generate more zombies ...
+            print(f'Generating two new zombies ... should be random, but staring with static.')
+            for i in range(2):
+                zombies.append(Zombie.generate_random())
             
             # Print initial state of zombies:
             print(f'State at start ............')
@@ -102,15 +117,11 @@ class Zombie:
 # Start by tracking game as global variables. Later probably a good idea to create a Game class
 
 def main():
-    print([random.randint(1, 10) for i in range(20)])
-    
-    '''
     print("Run a test game with no arrows ... expect to die.\n\n")
     Zombie.TESTME(arrows_per_zombie=0)
 
     print("\n\nRun a test game with 10 arrows at each zombie per round ... expect to live.\n\n")
     Zombie.TESTME(arrows_per_zombie=10)
-    '''
 
 if __name__ == "__main__":
     main()
