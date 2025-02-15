@@ -33,7 +33,7 @@ class Zombie:
         return self.health
 
     @classmethod
-    def TESTME(self):
+    def TESTME(self, arrows_per_round = 0):
         '''Creates some Zombies. At each round, the zombies move. Ends when a zombie's distance reaches 0.
         No arrows yet, so zombies just keep advancing!! We expect Chuck to win the race given his initial distance (20) and speed (8).
         Round 1: Chuck starts d=20, ends d=12; Round 2: Chuck d=12 drops to d=4; Round 3: Chuck reaches d=0; Game stops.
@@ -42,20 +42,43 @@ class Zombie:
         zombies = [Zombie("Abe", 10, 1, 5), Zombie("Bill", 200, 40, 20), Zombie("Chuck", 20, 8, 10)]
         for zombie in zombies:
             print(f'Zombie created: {zombie}')
+        
+        # TODO - improve performance later freezing dead zombies; for now, just keep updating them all but track if any are alive
+        numb_live_zombies = sum(z.alive for z in zombies) 
         min_distance = min(z.distance for z in zombies)
-        while min_distance > 0:
+
+        while (min_distance > 0) and (numb_live_zombies > 0):
             print(f'Round: {game_round} ........................................')
+            
+            # Print initial state of zombies:
             print(f'State at start ............')
             for z in zombies:
                 print(z) 
+
+            # Move each non-dead zombie:
             for z in zombies:
                 z.move()
+            
+            # Shoot a fixed number of arrows at each non-dead zombie:
+            for z in zombies:
+                z.hit_arrows(5)
+
+            # Display each zombie after moves and arrows    
             print(f'State at end ..........')   
             for z in zombies:
                 print(z) 
+
+            # Advance the round number and update the min distance and number of live zombies   
             game_round += 1
             min_distance = min(z.distance for z in zombies)
+            numb_live_zombies = sum(z.alive for z in zombies) 
  
+            # If all zombies are dead, player survived; otherwise rounds halted when a zombie's distance closed to zero.
+        if numb_live_zombies > 0:
+            print("You're dead!")
+        else:
+            print("You survived!")
+
 # Start by tracking game as global variables. Later probably a good idea to create a Game class
 
 def main():
