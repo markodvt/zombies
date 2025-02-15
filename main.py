@@ -35,15 +35,22 @@ class Zombie:
     @classmethod
     def TESTME(self):
         game_round = 1
-        zombie = Zombie("Chuck", 20, 5, 10)
-        print(f'Zombie created: {zombie.name}')
-        while zombie.distance > 0:
+        zombies = [Zombie("Abe", 10, 1, 5), Zombie("Bill", 200, 40, 20), Zombie("Chuck", 20, 5, 10)]
+        for zombie in zombies:
+            print(f'Zombie created: {zombie.name}')
+        min_distance = min(z.distance for z in zombies)
+        while min_distance > 0:
             print(f'Round: {game_round} .................')
-            print(f'State at start: {zombie}')
-            zombie.move()
-            print(f'State at   end: {zombie}')   
+            print(f'State at start ............')
+            for z in zombies:
+                print(z) 
+            for z in zombies:
+                z.move()
+            print(f'State at end ..........')   
+            for z in zombies:
+                print(z) 
             game_round += 1         
-
+ 
 # Start by tracking game as global variables. Later probably a good idea to create a Game class
 
 def main():
