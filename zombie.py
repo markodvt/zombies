@@ -59,6 +59,15 @@ class Zombie:
             self.alive = False
         return self.health
 
+    def active_rounds(self, final_game_round):
+        '''Calculate number of game rounds the zombie has been active, including the round it was created, to and including the round it was shot or the game ended.
+        e.g. if created in round 2 and game ended in round 5, then return 4 = (5-2) + 1 for rounds 2, 3, 4, 5
+        '''
+        if self.alive:
+            return final_game_round - self.round_created + 1
+        else:
+            return self.round_killed - self.round_created + 1
+
     @classmethod
     def generate_random(cls):
         '''TODO - make this random. Starting with simple, static constructor.
