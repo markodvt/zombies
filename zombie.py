@@ -16,6 +16,9 @@ This version doesn't allocate arrows to the most urgent zombie targets. It just 
 '''
 
 class Zombie:
+
+    zack_count = 0
+
     def __init__(self, name, distance, speed, health, rounds=1):
         self.name = name
         self.distance = distance
@@ -25,8 +28,8 @@ class Zombie:
         self.alive = True
 
     def __repr__(self):
-        return f'Zombie: name: {self.name}, distance: {self.distance}, speed: {self.speed}, health: {self.health}, rounds: {self.rounds}, alive: {self.alive}'
-    
+        return self.__class__.__name__ + str(self.__dict__)
+        
     def move(self):
         '''Move Zombie's position to max(0, self.distance - self.speed), returning Zombie's new distance to player.
         '''
@@ -51,7 +54,8 @@ class Zombie:
     def generate_random(cls):
         '''TODO - make this random. Starting with simple, static constructor.
         '''
-        inputs = ('Zack', 100, 10, 50)
+        cls.zack_count = cls.zack_count + 1
+        inputs = ('Zack ' + str(cls.zack_count), 100, 10, 50)
         new_zombie = Zombie(*inputs)
         return new_zombie
 
@@ -78,10 +82,10 @@ class Zombie:
         min_distance = min(z.distance for z in zombies)
 
         while (min_distance > 0) and (numb_live_zombies > 0) and (game_round <= MAX_ROUNDS):
-            print(f'Round: {game_round} ........................................')
+            print(f'Round: {game_round} ==========================================')
 
             # Generate more zombies ...
-            print(f'Generating two new zombies ... should be random, but staring with static.')
+            print(f'Generating two new zombies ... should be random, but starting with static.')
             for i in range(2):
                 zombies.append(Zombie.generate_random())
             
