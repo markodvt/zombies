@@ -8,9 +8,9 @@ class Player:
     TODO - implement strategy later so player can prioritize their arrows.
     TODO - may want to remove 'survived_rounds' later, unless multiple players.
     '''
-    def __init__(self, name, arrow_capacity, alive=True, entered_in_round = 1, killed_in_round = None, killed_by = None):
+    def __init__(self, name, quiver_capacity, alive=True, entered_in_round = 1, killed_in_round = None, killed_by = None):
         self.name = name
-        self.arrow_capacity = arrow_capacity
+        self.arrow_capacity = quiver_capacity
         self.alive = True
         self.entered_in_round = entered_in_round
         self.killed_in_round = killed_in_round
@@ -31,18 +31,21 @@ class Player:
             self.alive = False
             self.killed_by = zombie
 
-    def survive_round(self):
-        self.survive_round = self.survived_rounds + 1
-
-
 class Game:
-    '''Game state includes a roster of live and dead zombies, a current round, max_rounds, and player
+    '''Game state includes a player (just one for now), a list of named_zombies, a current round (default to 1), and max_rounds (to prevent infinite games).
+
+    Each round of the game:
+    - advance the current_round by one
+    - player refills their quiver to quiver_capacity
+    - all existing (live) zombies advance, in order they entered the game; first one to reach player kills the player
+    - new zombies appear at random (non-zero) distances
+    - player shoots all arrows, prioritizing zombies closest to player; "closest" is measured as distance/speed (which zombies will reach player soonest) 
     '''
-    def __init__(self, roster, player, max_rounds = 20):
+    def __init__(self, player, named_zombies, max_rounds=1000, current_round=1):
         self.player = player
-        self.roster = roster
+        self.zombies = named_zombies
         self.max_rounds = max_rounds
-        self.current_round = 1
+        self.current_round = current_round
         
 
     def __repr__(self):
@@ -58,14 +61,14 @@ class Game:
         print('Last round played: ROUND ' + str(self.current_round))        
         print('\nPlayer: ' + str(self.player))
         print('\nZombies:\n')
-        for z in self.roster:
+        for z in self.zombies:
             print(z)
         print('\n\n')
 
     @classmethod
     def TestMe(cls):
 
-        player = Player('Steve', arrow_capacity = 10)
+        player = Player('Steve', quiver_capacity = 10)
         
         zombie_inputs = [
             ("Abe", 10, 1, 5), 
@@ -73,7 +76,7 @@ class Game:
             ("Chuck", 20, 8, 10)
         ]
         
-        game = Game(roster = [Zombie(*z) for z in zombie_inputs], player = player, max_rounds = 10)
+        game = Game(player = player, named_zombies = [Zombie(*z) for z in zombie_inputs],  max_rounds = 10)
         game.pretty_print()
 
 def main():
