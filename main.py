@@ -19,7 +19,7 @@ class Player:
         
     def __repr__(self):
         # return self.__class__.__name__ + str(self.__dict__)
-        print_keys = ('name', 'alive', 'killed_in_round', 'killed_by')
+        print_keys = ('name', 'alive', 'quiver_capacity', 'killed_in_round', 'killed_by')
         result = self.__class__.__name__ + '{' 
         result += ', '.join(f'{k}: {self.__dict__[k]}' for k in print_keys)
         result += '}'
@@ -84,9 +84,9 @@ class Game:
         for z in self.zombies:
             if z.alive:
                 new_dist = z.move()
-            if player_lives & (new_dist == 0):
-                player_lives = False
-                self.player.killed(z, self.current_round)
+                if player_lives & (new_dist == 0):
+                    player_lives = False
+                    self.player.killed(z, self.current_round)
 
         if player_lives:
             # Generate new zombies
@@ -95,6 +95,12 @@ class Game:
                 self.zombies.append(Zombie.generate_random())
 
             # Shoot all arrows at most urgent zombies
+            # TODO - implement real arrow logic.
+            for z in self.zombies:
+                if z.alive:
+                    arrows_to_shoot = min(z.health, self.player.remaining_arrows)
+                    z.hit_arrows(arrows_to_shoot)
+                    self.player.remaining_arrows -= arrows_to_shoot
             self.status = 'Round completed'
             return True
         else:
@@ -102,20 +108,32 @@ class Game:
             return False
 
     def prep_next_round(self):
-        '''Returns True if player is alive, and preps for next round. Returns False if player is dead.
+        '''Returns True if game is over.
         '''
         if self.status != 'Round completed':
             raise RuntimeError("Can't prep for next round unless current round is marked completed.")
         
         if not(self.player.alive):
-            return False
+            return True
 
         if self.current_round == self.max_rounds:
-            raise RuntimeError("Can't prep for next round if current round hit the max_rounds.")
+            self.status = "Survived Max Rounds!!"
+            return True
 
         self.current_round += 1
         self.status = 'Not started'
-        return True
+        return False
+
+    def play_game(self):
+        player_alive = True
+        game_over = False
+        while (player_alive and not(game_over)):
+            print(self.summary())
+            player_alive = self.play_round()
+            game_over = self.prep_next_round()
+        print(self.summary())
+        if game_over:
+            print(f'\n{self.status}\n')
 
 
     def summary(self):
@@ -133,24 +151,23 @@ class Game:
     @classmethod
     def TestMe(cls):
 
-        player = Player('Steve', quiver_capacity = 10)
-        
         zombie_inputs = [
             ("Abe", 10, 1, 5), 
             ("Bill", 200, 40, 20),
             ("Chuck", 20, 8, 10)
         ]
-        
-        game = Game(player = player, named_zombies = [Zombie(*z) for z in zombie_inputs],  max_rounds = 10)
-        
-        # initial game has no new zombies, no arrows. Ends when Player is eaten.
-        player_alive = True
-        while (player_alive):
-            print(game.summary())
-            player_alive = game.play_round()
-            game.prep_next_round()
-        print(game.summary())
 
+        player1 = Player('Steve', quiver_capacity = 10)
+        player2 = Player('Jimmy', quiver_capacity = 50)
+        
+        game1 = Game(player = player1, named_zombies = [Zombie(*z) for z in zombie_inputs],  max_rounds = 10)
+        game2 = Game(player = player2, named_zombies = [Zombie(*z) for z in zombie_inputs],  max_rounds = 10)
+        
+        print('PLAY GAME ONE ... Player = Steve, can shoot only 10 arrows per round ...\n\n')
+        game1.play_game()
+
+        print('\nPLAY GAME TWO ... Player = Jimmy, can shoot only 50 arrows per round ...\n\n')
+        game2.play_game()
 
 def main():
     Game.TestMe()
