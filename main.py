@@ -90,6 +90,10 @@ class Game:
 
         if player_lives:
             # Generate new zombies
+            print(f'Generating two new zombies ... should be random, but starting with static.')
+            for i in range(2):
+                self.zombies.append(Zombie.generate_random())
+
             # Shoot all arrows at most urgent zombies
             self.status = 'Round completed'
             return True
@@ -147,17 +151,6 @@ class Game:
             game.prep_next_round()
         print(game.summary())
 
-
-        '''
-        print("\nInitial Game configuration .................")
-        print(game.summary())
-        print("After a round")
-        game.play_round()
-        print(game.summary())
-        print("After a round")
-        game.play_round()
-        print(game.summary())
-        '''
 
 def main():
     Game.TestMe()
