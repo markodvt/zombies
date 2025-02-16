@@ -12,7 +12,7 @@ class Player:
     In the event of ties in ETA, you should shoot the zombie with the lower health.
     If zombies are also tied in health, you should shoot the zombie with the lexicographically smaller name.
     '''
-    def __init__(self, name, quiver_capacity, alive=True, entered_in_round = 1, killed_in_round = None, killed_by = None):
+    def __init__(self, name, quiver_capacity, zombie_queue=None, alive=True, entered_in_round = 1, killed_in_round = None, killed_by = None):
         self.name = name
         self.quiver_capacity = quiver_capacity
         self.alive = True
@@ -20,6 +20,7 @@ class Player:
         self.killed_in_round = killed_in_round
         self.killed_by = killed_by
         self.remaining_arrows = 0
+        self.zombie_queue = zombie_queue
         
     def __repr__(self):
         # return self.__class__.__name__ + str(self.__dict__)
@@ -36,6 +37,20 @@ class Player:
             self.alive = False
             self.killed_by = zombie
             self.killed_in_round = round
+
+    def update_zombie_queue(self, zombie_array):
+        '''Generate a priority queue based on updated attributes of the zombies in the zombie_array. This is used in a game, after the array game.zombies reflects new positions of the zombies.
+        
+        Begin with naiive implementation ... just return 0..len(array)
+        '''
+        self.zombie_gueue = list(range(len(zombie_array)))
+
+    def next_target_zombie(self):
+        '''Returns index (in zombie_array) of the most dangerous zombie, so player can aim available arrows at zombie_array[next_target_zombie()].
+        
+        Begin with naiive implementation ... just return next index.
+        '''
+        return self.zombie_gueue.pop(0)
 
 class Game:
     '''Game state includes a player (just one for now), a list of named_zombies, a current round (default to 1), and max_rounds (to prevent infinite games).
@@ -102,7 +117,18 @@ class Game:
 
             # Shoot all arrows at most urgent zombies
             # TODO - implement real arrow logic.
-            for z in self.zombies:
+
+            # Recalculate player's zombie_queue based on new zombie positions
+            # copy of live zombies
+            live_zombies = [z for z in self.zombies if z.alive]
+            self.player.update_zombie_queue(live_zombies)
+            
+
+            # TODO - move this logic into a player method !!!
+            i = -1
+            while (self.player.remaining_arrows > 0 and i < len(live_zombies)-1):
+                i += 1 # self.player.next_target_zombie()
+                z = live_zombies[i]
                 if z.alive:
                     arrows_to_shoot = min(z.health, self.player.remaining_arrows)
                     z.hit_arrows(arrows_to_shoot)
