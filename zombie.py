@@ -33,6 +33,7 @@ class Zombie:
         self.time_to_player = math.ceil(distance/speed)
 
     def __repr__(self):
+        # return self.__class__.__name__ + str(self.__dict__) ... use to see all attributes
         print_keys = ('name', 'alive', 'distance', 'health')
         result = self.__class__.__name__ + '{' 
         result += ', '.join(f'{k}: {self.__dict__[k]}' for k in print_keys)

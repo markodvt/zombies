@@ -8,15 +8,21 @@ class Player:
     TODO - implement strategy later so player can prioritize their arrows.
     TODO - may want to remove 'survived_rounds' later, unless multiple players.
     '''
-    def __init__(self, name, arrow_capacity):
+    def __init__(self, name, arrow_capacity, alive=True, entered_in_round = 1, killed_in_round = None, killed_by = None):
         self.name = name
         self.arrow_capacity = arrow_capacity
         self.alive = True
-        self.killed_by = None
-        self.survived_rounds = 0
-
+        self.entered_in_round = entered_in_round
+        self.killed_in_round = killed_in_round
+        self.killed_by = killed_by
+        
     def __repr__(self):
-        return self.__class__.__name__ + str(self.__dict__)
+        # return self.__class__.__name__ + str(self.__dict__)
+        print_keys = ('name', 'alive', 'killed_in_round', 'killed_by')
+        result = self.__class__.__name__ + '{' 
+        result += ', '.join(f'{k}: {self.__dict__[k]}' for k in print_keys)
+        result += '}'
+        return result
 
     def killed(self, zombie):
         if not(self.alive):
@@ -48,7 +54,7 @@ class Game:
         print('\n' + ('=' * 40))
         print('GAME SUMMARY')
         print('=' * 40)
-        print('Player is: ' + 'ALIVE' if self.player.alive else 'DEAD')
+        print('Player ' + self.player.name + ' is: ' + 'ALIVE' if self.player.alive else 'DEAD')
         print('Last round played: ROUND ' + str(self.current_round))        
         print('\nPlayer: ' + str(self.player))
         print('\nZombies:\n')
