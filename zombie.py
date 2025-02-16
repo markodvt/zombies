@@ -34,7 +34,7 @@ class Zombie:
 
     def __repr__(self):
         # return self.__class__.__name__ + str(self.__dict__) ... use to see all attributes
-        print_keys = ('name', 'alive', 'distance', 'health')
+        print_keys = ('name', 'alive', 'distance', 'speed', 'health')
         result = self.__class__.__name__ + '{' 
         result += ', '.join(f'{k}: {self.__dict__[k]}' for k in print_keys)
         result += '}'
@@ -72,7 +72,7 @@ class Zombie:
     def generate_random(cls):
         '''TODO - make this random. Starting with simple, static constructor.
         '''
-        cls.zack_count = cls.zack_count + 1
+        cls.zack_count += 1
         inputs = ('Zack ' + str(cls.zack_count), 100, 10, 50)
         new_zombie = Zombie(*inputs)
         return new_zombie
