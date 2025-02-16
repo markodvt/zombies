@@ -33,11 +33,11 @@ Zombies are not particularly attentive to detail, so we will not be checking you
 ## The Zombies
 A zombie is defined by five attributes:
 
-1. NAME - A string name. Names will always be unique in our test cases (and you do not need to check for this).
-2. DISTANCE - A uint32_t distance between the zombie and the player
-3. SPEED - A uint32_t speed (>0) at which the zombie moves toward you
-4. HEALTH - A uint32_t health (>0), the amount of damage the zombie can take before being destroyed
-5. ROUNDS - The number of rounds the zombie has been active. This is measured as the number of rounds, from and including the round it was created, to and including the round it was shot or when the game ends. If the zombie was created in round 2 and was shot or the player was eaten in round 5, it was active for 4 rounds (rounds 2, 3, 4, and 5).
+1. name - A string name. Names will always be unique in our test cases (and you do not need to check for this).
+2. distance - A uint32_t distance between the zombie and the player
+3. speed - A uint32_t speed (>0) at which the zombie moves toward you
+4. health - A uint32_t health (>0), the amount of damage the zombie can take before being destroyed
+5. rounds - The number of rounds the zombie has been active. This is measured as the number of rounds, from and including the round it was created, to and including the round it was shot or when the game ends. If the zombie was created in round 2 and was shot or the player was eaten in round 5, it was active for 4 rounds (rounds 2, 3, 4, and 5).
 
 ## The Battle
 ### The Schedule
