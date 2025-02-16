@@ -69,7 +69,7 @@ class Zombie:
             return self.round_killed - self.round_created + 1
 
     @classmethod
-    def generate_random(cls):
+    def generate_random_Zack(cls):
         '''TODO - make this random. Starting with simple, static constructor.
         '''
         cls.zack_count += 1
@@ -105,7 +105,7 @@ class Zombie:
             # Generate more zombies ...
             print(f'Generating two new zombies ... should be random, but starting with static.')
             for i in range(2):
-                zombies.append(Zombie.generate_random())
+                zombies.append(Zombie.generate_random_Zack())
             
             # Print initial state of zombies:
             print(f'State at start ............')

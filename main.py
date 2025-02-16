@@ -5,8 +5,12 @@ from zombie import Zombie
 
 class Player:
     '''Player has a name and arrow_capacity. 
+
     TODO - implement strategy later so player can prioritize their arrows.
-    TODO - may want to remove 'survived_rounds' later, unless multiple players.
+    Prioritize shooting the zombie with the lowest ETA. You may shoot the same zombie with several arrows during a round, but do not continue to shoot a zombie that has been destroyed (i.e. after its health has reached zero).
+
+    In the event of ties in ETA, you should shoot the zombie with the lower health.
+    If zombies are also tied in health, you should shoot the zombie with the lexicographically smaller name.
     '''
     def __init__(self, name, quiver_capacity, alive=True, entered_in_round = 1, killed_in_round = None, killed_by = None):
         self.name = name
@@ -92,7 +96,7 @@ class Game:
             # Generate new zombies
             print(f'Generating two new zombies ... should be random, but starting with static.')
             for i in range(2):
-                self.zombies.append(Zombie.generate_random())
+                self.zombies.append(Zombie.generate_random_Zack())
 
             # Shoot all arrows at most urgent zombies
             # TODO - implement real arrow logic.
