@@ -30,7 +30,7 @@ class Zombie:
         self.round_created = round_created
         self.round_killed = round_killed
         self.alive = alive
-        self.time_to_player = math.ceil(distance/speed)
+        self.ETA = math.ceil(distance/speed)
 
     def __repr__(self):
         # return self.__class__.__name__ + str(self.__dict__) ... use to see all attributes
