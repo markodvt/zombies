@@ -1,4 +1,4 @@
-from zombie import Zombie
+from zombie import Zombie, RandomZombieGenerator
 
 '''A Game represewnts the state of a roster of Zombies and the state of the Player over a sequence of rounds.
 '''
@@ -54,13 +54,14 @@ class Game:
     - priority queue (attached to Player) that references the zombies in the order they should be shot with arrows.
     '''
     
-    def __init__(self, player, named_zombies, max_rounds=1000, current_round=1, status='Not started'):
+    def __init__(self, player, named_zombies, zombie_generator=None, max_rounds=1000, current_round=1, status='Not started'):
         # TODO - add game settings to control 
         self.player = player
         self.zombies = named_zombies
         self.max_rounds = max_rounds
         self.current_round = current_round
         self.status = status
+        self.zombie_generator = zombie_generator
 
     def __repr__(self):
         '''Display current state of the Game
@@ -96,7 +97,8 @@ class Game:
             # Generate new zombies
             print(f'Generating two new zombies ... should be random, but starting with static.')
             for i in range(2):
-                self.zombies.append(Zombie.generate_random_Zack())
+                # self.zombies.append(Zombie.generate_random_Zack())
+                self.zombies.append(Zombie.generate_random_zombie(self.zombie_generator))
 
             # Shoot all arrows at most urgent zombies
             # TODO - implement real arrow logic.
@@ -161,11 +163,20 @@ class Game:
             ("Chuck", 20, 8, 10)
         ]
 
+        random_zombie_config = {
+            'random_seed': 42,
+            'max_rand_distance': 100,
+            'max_rand_speed': 40,
+            'max_rand_health': 25
+        }
+
+        zombie_generator = RandomZombieGenerator(**random_zombie_config)
+
         player1 = Player('Steve', quiver_capacity = 10)
         player2 = Player('Jimmy', quiver_capacity = 50)
         
-        game1 = Game(player = player1, named_zombies = [Zombie(*z) for z in zombie_inputs],  max_rounds = 10)
-        game2 = Game(player = player2, named_zombies = [Zombie(*z) for z in zombie_inputs],  max_rounds = 10)
+        game1 = Game(player = player1, named_zombies = [Zombie(*z) for z in zombie_inputs], zombie_generator = zombie_generator, max_rounds = 10)
+        game2 = Game(player = player2, named_zombies = [Zombie(*z) for z in zombie_inputs], zombie_generator = zombie_generator, max_rounds = 10)
         
         print('PLAY GAME ONE ... Player = Steve, can shoot only 10 arrows per round ...\n\n')
         game1.play_game()
