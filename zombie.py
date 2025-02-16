@@ -16,8 +16,37 @@ This version doesn't allocate arrows to the most urgent zombie targets. It just 
 ** Added a MAX_ROUNDS = 50 setting to prevent an infinite game. In prior version, the no arrows game terminates (player eaten) but the other game never ends ... new live zombies appear in every round, alongside other live zombies.
 '''
 
+class RandomZombieGenerator:
+    '''Random zombie generation function calls
+    std::string name  = P2random::getNextZombieName();    	
+    uint32_t distance = P2random::getNextZombieDistance();    	
+    uint32_t speed    = P2random::getNextZombieSpeed();    	
+    uint32_t health   = P2random::getNextZombieHealth();
+    '''
+    def __init__(self, random_seed, max_rand_distance, max_rand_speed, max_rand_health):
+        self.random_seed = random_seed
+        self.max_rand_distance = max_rand_distance
+        self.max_rand_speed = max_rand_speed
+        self.max_rand_health = max_rand_health
+        self.Zacks = 0
+        random.seed(random_seed)
+    
+    def getNextZombieName(self):
+        self.Zacks += 1
+        return 'Zack' + str(self.Zacks)
+
+    def getNextZombieDistance(self):
+        return random.randint(1, self.max_rand_distance)
+
+    def getNextZombieSpeed(self):
+        return random.randint(1, self.max_rand_speed)
+
+    def getNextZombieHealth(self):
+        return random.randint(1, self.max_rand_health)
+
 class Zombie:
 
+    # used by old randomZack method
     zack_count = 0
 
     def __init__(self, name, distance, speed, health, round_created=None, round_killed=None, alive=True):
@@ -69,6 +98,16 @@ class Zombie:
             return self.round_killed - self.round_created + 1
 
     @classmethod
+    def generate_random_zombie(cls, zombie_generator):
+        zombie_input = (
+            zombie_generator.getNextZombieName(),
+            zombie_generator.getNextZombieDistance(),
+            zombie_generator.getNextZombieSpeed(),
+            zombie_generator.getNextZombieHealth()
+        )
+        return Zombie(*zombie_input)
+
+    @classmethod
     def generate_random_Zack(cls):
         '''TODO - make this random. Starting with simple, static constructor.
         '''
@@ -86,6 +125,15 @@ class Zombie:
         Adding poor version of random zombies ... presently they're all the same, named "Zack".
                 
         '''
+        # Initialize a RandomZombieGenerator
+        game_config = {
+            'random_seed': 42,
+            'max_rand_distance': 100,
+            'max_rand_speed': 40,
+            'max_rand_health': 25
+        }
+
+        zombie_generator = RandomZombieGenerator(**game_config)
 
         # Initialize Game by creating zombies, setting round = 1, setting MAX_ROUNDS 
         game_round = 1
@@ -105,8 +153,9 @@ class Zombie:
             # Generate more zombies ...
             print(f'Generating two new zombies ... should be random, but starting with static.')
             for i in range(2):
-                zombies.append(Zombie.generate_random_Zack())
-            
+                # zombies.append(Zombie.generate_random_Zack())
+                zombies.append(Zombie.generate_random_zombie(zombie_generator))
+
             # Print initial state of zombies:
             print(f'State at start ............')
             for z in zombies:
@@ -117,10 +166,14 @@ class Zombie:
                 if z.alive:
                     z.move()
             
+            # Check if player was killed
+            killers = [z for z in zombies if (z.distance == 0 and z.health > 0)]
+
             # Shoot a fixed number of arrows at each non-dead zombie:
-            for z in zombies:
-                if z.alive:
-                    z.hit_arrows(arrows_per_zombie)
+            if not(killers):
+                for z in zombies:
+                    if z.alive:
+                        z.hit_arrows(arrows_per_zombie)
 
             # Display each zombie after moves and arrows    
             print(f'State at end ..........')   
@@ -136,7 +189,7 @@ class Zombie:
         if game_round >= MAX_ROUNDS:
             print(f'\nYou survived {MAX_ROUNDS} rounds, time is up.\n')
         elif numb_live_zombies > 0:
-            print(f'\nYou are dead, eaten by {[z.name for z in zombies if (z.alive and not(z.distance))]}!\n')
+            print(f'\nYou are dead, eaten by {killers}!\n')
         else:
             print("\nYou survived, all zombies are terminated!\n")
 
