@@ -1,4 +1,5 @@
 import random
+import math
 
 '''Defines a class Zombie that does the following:
 - tracks zombie's state (name, distance, speed, health, rounds until killed, alive=T or F)
@@ -19,16 +20,24 @@ class Zombie:
 
     zack_count = 0
 
-    def __init__(self, name, distance, speed, health, rounds=1):
+    def __init__(self, name, distance, speed, health, round_created=None, round_killed=None, alive=True):
         self.name = name
+        self.init_distance = distance
         self.distance = distance
-        self.speed = speed
+        self.init_health = health
         self.health = health
-        self.rounds = 1
-        self.alive = True
+        self.speed = speed
+        self.round_created = round_created
+        self.round_killed = round_killed
+        self.alive = alive
+        self.time_to_player = math.ceil(distance/speed)
 
     def __repr__(self):
-        return self.__class__.__name__ + str(self.__dict__)
+        print_keys = ('name', 'alive', 'distance', 'health')
+        result = self.__class__.__name__ + '{' 
+        result += ', '.join(f'{k}: {self.__dict__[k]}' for k in print_keys)
+        result += '}'
+        return result
         
     def move(self):
         '''Move Zombie's position to max(0, self.distance - self.speed), returning Zombie's new distance to player.
@@ -36,7 +45,6 @@ class Zombie:
         if not(self.alive):
             raise RuntimeError(f'Tried to move a dead Zombie {self.name}') 
         self.distance = max(0, self.distance - self.speed)
-        self.rounds = self.rounds + 1
         return self.distance
 
     def hit_arrows(self, arrows):
