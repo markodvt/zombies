@@ -50,6 +50,14 @@ class Zombie:
             return final_game_round - self.round_created + 1
         else:
             return self.round_killed - self.round_created + 1
+
+    def priority(self):
+        '''Used by Player to measure the urgency of shooting arrows at a zombie. Low means urgent. Measured as ETA (number of rounds until zombie reaches player), then health (kill weak zombies first), then zombie name (lowest lexagraphical name in ASCI). In python, a pair of tuples (a0, a1, a2) and (b0, b1, b2) are ordered by comparing a0 to b0, then a1 to b1, then a2 to b2, etc.
+        '''
+        if not(self.alive):
+            raise ValueError(f'Calling priority on a dead zombie {self.name}.')
+
+        return (self.ETA, self.health, [ord(c) for c in self.name])
     
     @classmethod
     def TESTME(cls, arrows_per_zombie = 0, MAX_ROUNDS = 10):
@@ -70,6 +78,10 @@ class Zombie:
         print(f'{"="*40}\nInitial Zombies\n{"="*40}')
         for z in zombies:
             print(z)
+            if z.alive:
+                print(f'Priority (ETA, health, ascii_name:  {z.priority()}\n')
+            else:
+                print('This zombie is dead\n.')
 
         for round in range(1, 5):
             print(f'{"="*40}\nEnd of Round {round}\n{"="*40}')
@@ -82,6 +94,9 @@ class Zombie:
                     z.suffer_arrows(arrows_per_zombie)
             for z in zombies:
                 print(z)
+            priorities = [(z.priority(), z.name) for z in zombies if z.alive]
+            priorities.sort()
+            print(f'Priorities: {priorities}\n')
 
                 
 def main():
