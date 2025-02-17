@@ -28,19 +28,3 @@ class Player:
             self.alive = False
             self.killed_by = zombie
             self.killed_in_round = round
-
-    '''
-    def update_zombie_queue(self, zombie_array):
-        Generate a priority queue based on updated attributes of the zombies in the zombie_array. This is used in a game, after the array game.zombies reflects new positions of the zombies.
-        
-        Begin with naiive implementation ... just return 0..len(array)
-        
-        self.zombie_gueue = list(range(len(zombie_array)))
-
-    def next_target_zombie(self):
-        Returns index (in zombie_array) of the most dangerous zombie, so player can aim available arrows at zombie_array[next_target_zombie()].
-        
-        Begin with naiive implementation ... just return next index.
-        
-        return self.zombie_gueue.pop(0)
-    '''
