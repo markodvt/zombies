@@ -32,11 +32,11 @@ class Game:
         # TODO - add game settings to control 
         self.player = player
         self.zombies = named_zombies
+        self.zombie_generator = zombie_generator
         self.max_rounds = max_rounds
         self.current_round = current_round
         self.status = status
-        self.zombie_generator = zombie_generator
-
+        
 
     def __repr__(self):
         '''Display current state of the Game
@@ -123,7 +123,9 @@ class Game:
         return False
 
     def play_game(self):
-        player_alive = True
+        player_alive = self.player.alive
+        if not(player_alive):
+            raise ValueError("Can't start a game if player is already dead.")
         game_over = False
         while (player_alive and not(game_over)):
             # print(self.summary())
