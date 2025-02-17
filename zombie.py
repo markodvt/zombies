@@ -1,75 +1,29 @@
-import random
 import math
 
-'''Defines a class Zombie that does the following:
-- tracks zombie's state (name, distance, speed, health, rounds until killed, alive=T or F)
-- moves a zombie (returning it's remaining distance after the move)
-- hits a zombie with arrows (returning it's remaining health)
--- TESTME (a Zombie class method) runs a couple games ... one with no arrows, one with arrows
-
-This version lacks any class or encapsulation of the actual Game.
-
-This version doesn't make use of the return values of move or hit_arrows. It just updates zombie state for every zombie, and then updates the global game variables after each round.
-
-This version doesn't allocate arrows to the most urgent zombie targets. It just shoots x arrows at every zombie.
-
-** Added a MAX_ROUNDS = 50 setting to prevent an infinite game. In prior version, the no arrows game terminates (player eaten) but the other game never ends ... new live zombies appear in every round, alongside other live zombies.
-'''
-
-class RandomZombieGenerator:
-    '''Random zombie generation function calls
-    std::string name  = P2random::getNextZombieName();    	
-    uint32_t distance = P2random::getNextZombieDistance();    	
-    uint32_t speed    = P2random::getNextZombieSpeed();    	
-    uint32_t health   = P2random::getNextZombieHealth();
-    '''
-    def __init__(self, random_seed, max_rand_distance, max_rand_speed, max_rand_health):
-        self.random_seed = random_seed
-        self.max_rand_distance = max_rand_distance
-        self.max_rand_speed = max_rand_speed
-        self.max_rand_health = max_rand_health
-        self.Zacks = 0
-        random.seed(random_seed)
-    
-    def getNextZombieName(self):
-        self.Zacks += 1
-        return 'Zack' + str(self.Zacks)
-
-    def getNextZombieDistance(self):
-        return random.randint(1, self.max_rand_distance)
-
-    def getNextZombieSpeed(self):
-        return random.randint(1, self.max_rand_speed)
-
-    def getNextZombieHealth(self):
-        return random.randint(1, self.max_rand_health)
-
 class Zombie:
-
-    # used by old randomZack method
-    zack_count = 0
-
+    '''
+    Simple Zombie class to track a zombie's state and support methods:
+    move, take_arrows, and calculate number of rounds a zombie has been active. (Generating new zombies at random distances is hanled outside this module.)
+    '''
     def __init__(self, name, distance, speed, health, round_created=None, round_killed=None, alive=True):
         self.name = name
-        self.init_distance = distance
         self.distance = distance
-        self.init_health = health
-        self.health = health
         self.speed = speed
+        self.health = health
         self.round_created = round_created
         self.round_killed = round_killed
         self.alive = alive
         self.ETA = math.ceil(distance/speed)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         # return self.__class__.__name__ + str(self.__dict__) ... use to see all attributes
-        print_keys = ('name', 'alive', 'distance', 'speed', 'health')
+        print_keys = ('name', 'alive', 'distance', 'speed', 'ETA', 'health')
         result = self.__class__.__name__ + '{' 
         result += ', '.join(f'{k}: {self.__dict__[k]}' for k in print_keys)
         result += '}'
         return result
         
-    def move(self):
+    def move(self) -> int:
         '''Move Zombie's position to max(0, self.distance - self.speed), returning Zombie's new distance to player.
         '''
         if not(self.alive):
@@ -77,7 +31,7 @@ class Zombie:
         self.distance = max(0, self.distance - self.speed)
         return self.distance
 
-    def hit_arrows(self, arrows):
+    def hit_arrows(self, arrows: int) -> int:
         '''Update Zombie's health after taking arrow hits, returnig Zombie's remaining health. Raise errors if number of arrows exceeds Zombie's health.
         '''
         if not(self.alive):
@@ -88,7 +42,7 @@ class Zombie:
             self.alive = False
         return self.health
 
-    def active_rounds(self, final_game_round):
+    def active_rounds(self, final_game_round: int) -> int:
         '''Calculate number of game rounds the zombie has been active, including the round it was created, to and including the round it was shot or the game ended.
         e.g. if created in round 2 and game ended in round 5, then return 4 = (5-2) + 1 for rounds 2, 3, 4, 5
         '''
@@ -96,66 +50,34 @@ class Zombie:
             return final_game_round - self.round_created + 1
         else:
             return self.round_killed - self.round_created + 1
-
-    @classmethod
-    def generate_random_zombie(cls, zombie_generator):
-        zombie_input = (
-            zombie_generator.getNextZombieName(),
-            zombie_generator.getNextZombieDistance(),
-            zombie_generator.getNextZombieSpeed(),
-            zombie_generator.getNextZombieHealth()
-        )
-        return Zombie(*zombie_input)
-
-    @classmethod
-    def generate_random_Zack(cls):
-        '''TODO - make this random. Starting with simple, static constructor.
-        '''
-        cls.zack_count += 1
-        inputs = ('Zack ' + str(cls.zack_count), 100, 10, 50)
-        new_zombie = Zombie(*inputs)
-        return new_zombie
-
+    
     @classmethod
     def TESTME(cls, arrows_per_zombie = 0, MAX_ROUNDS = 10):
         '''Creates some Zombies. At each round, the zombies move. Ends when a zombie's distance reaches 0.
         No arrows yet, so zombies just keep advancing!! We expect Chuck to win the race given his initial distance (20) and speed (8).
-        Round 1: Chuck starts d=20, ends d=12; Round 2: Chuck d=12 drops to d=4; Round 3: Chuck reaches d=0; Game stops.
-        
-        Adding poor version of random zombies ... presently they're all the same, named "Zack".
-                
+        Round 1: Chuck starts d=20, ends d=12; Round 2: Chuck d=12 drops to d=4; Round 3: Chuck reaches d=0; Game stops.                
         '''
-        # Initialize a RandomZombieGenerator
-        game_config = {
-            'random_seed': 42,
-            'max_rand_distance': 100,
-            'max_rand_speed': 40,
-            'max_rand_health': 25
-        }
+        zombie_attributes = [
+            {'name': 'Abe', 'distance': 10, 'speed': 1, 'health': 5},
+            {'name': 'Bill', 'distance': 200, 'speed': 40, 'health': 20},
+            {'name': 'Chuck', 'distance': 20, 'speed': 8, 'health': 10}
+        ]       
 
-        zombie_generator = RandomZombieGenerator(**game_config)
+        zombies = [Zombie(**z) for z in zombie_attributes]
 
-        # Initialize Game by creating zombies, setting round = 1, setting MAX_ROUNDS 
         game_round = 1
-        zombies = [Zombie("Abe", 10, 1, 5), Zombie("Bill", 200, 40, 20), Zombie("Chuck", 20, 8, 10)]
+
         for zombie in zombies:
             print(f'Zombie created: {zombie}')
 
         print(f'\nAt each round, shoot {arrows_per_zombie} arrows at each living zombie.\n')
         
-        # TODO - improve performance later freezing dead zombies; for now, just keep updating them all but track if any are alive
         numb_live_zombies = sum(z.alive for z in zombies) 
         min_distance = min(z.distance for z in zombies)
 
         while (min_distance > 0) and (numb_live_zombies > 0) and (game_round <= MAX_ROUNDS):
             print(f'Round: {game_round} ==========================================')
-
-            # Generate more zombies ...
-            print(f'Generating two new zombies ... should be random, but starting with static.')
-            for i in range(2):
-                # zombies.append(Zombie.generate_random_Zack())
-                zombies.append(Zombie.generate_random_zombie(zombie_generator))
-
+           
             # Print initial state of zombies:
             print(f'State at start ............')
             for z in zombies:
