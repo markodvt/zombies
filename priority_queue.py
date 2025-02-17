@@ -20,23 +20,19 @@ class Priority_queue:
     @classmethod
     def TestMe(cls):
         print(f'{'='*40}\nTesting class: {cls.__name__}\n{'='*40}')
-        print(f'Pushing 4 items (Item A, Item B, Item C, Item D) onto Priority_queue ... with priorities 3, 1, 2, 1')
+
+        items = [("Task A", 3), ("Task B", 1), ("Task C", 2), ("Task D", 1)]
+
+        print(f'Unpacking and pushing 4 items: {items} onto Priority_queue.\n')
 
         pq = Priority_queue()
-        pq.push("Task A", 3)
-        pq.push("Task B", 1)
-        pq.push("Task C", 2)
-        pq.push("Task D", 1)
+        for i in items:
+            pq.push(*i)
         
         print('Popping off ... expected order B, D, C, A')
 
         while not pq.empty():
             print(pq.pop())
-        # Expected output:
-        # Task B
-        # Task D
-        # Task C
-        # Task A
 
 def main():
     Priority_queue.TestMe()
