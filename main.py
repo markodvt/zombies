@@ -1,6 +1,7 @@
 from zombie import Zombie
-from zombie_generator import RandomZombieGenerator
+from zombie_generator import Zombie_generator
 from player import Player
+from priority_queue import Priority_queue
 
 '''A Game represewnts the state of a roster of Zombies and the state of the Player over a sequence of rounds.
 '''
@@ -20,9 +21,14 @@ class Game:
     Track zombies using two data structures: 
     - zombie array (attached to Game) tracks zombies in the order they were created, which also is the order they move.
     - priority queue (attached to Player) that references the zombies in the order they should be shot with arrows.
+
+    Player uses a priority_queue (updated at each round) to prioritize shooting arrows at zombies with lowest ETA.
+
+    In the event of ties in ETA, you should shoot the zombie with the lower health.
+    If zombies are also tied in health, you should shoot the zombie with the lexicographically smaller name (in ASCI).
     '''
     
-    def __init__(self, player, named_zombies, zombie_generator=None, max_rounds=1000, current_round=1, status='Not started'):
+    def __init__(self, player, named_zombies, zombie_generator, priority_queue=None, max_rounds=1000, current_round=1, status='Not started'):
         # TODO - add game settings to control 
         self.player = player
         self.zombies = named_zombies
@@ -30,6 +36,7 @@ class Game:
         self.current_round = current_round
         self.status = status
         self.zombie_generator = zombie_generator
+
 
     def __repr__(self):
         '''Display current state of the Game
@@ -55,6 +62,8 @@ class Game:
         # Refill player's arrows
         self.player.remaining_arrows = self.player.quiver_capacity
         player_lives = self.player.alive
+        print("Starting Round with these initial zombie positions ... ")
+        print(self.summary())
 
         # Advance all live zombies
         for z in self.zombies:
@@ -66,29 +75,30 @@ class Game:
 
         if player_lives:
             # Generate new zombies
-            print(f'Generating two new zombies ... should be random, but starting with static.')
+            print(f'Generating two new zombies ....')
             for i in range(2):
                 z = self.generate_random_zombie()
                 self.zombies.append(z)
 
-            # Shoot all arrows at most urgent zombies
-            # TODO - implement real arrow logic.
-
             # Recalculate player's zombie_queue based on new zombie positions
             # copy of live zombies
-            live_zombies = [z for z in self.zombies if z.alive]
-            self.player.update_zombie_queue(live_zombies)
+            pq = Priority_queue()
+            for z in self.zombies:
+                if z.alive:
+                    pq.push(z, z.priority())
             
+            self.priority_queue = pq
+        
+            print("Zombies advanced, new were generated, ... ")
+            print(self.summary())
 
             # TODO - move this logic into a player method !!!
-            i = -1
-            while (self.player.remaining_arrows > 0 and i < len(live_zombies)-1):
-                i += 1 # self.player.next_target_zombie()
-                z = live_zombies[i]
-                if z.alive:
-                    arrows_to_shoot = min(z.health, self.player.remaining_arrows)
-                    z.hit_arrows(arrows_to_shoot)
-                    self.player.remaining_arrows -= arrows_to_shoot
+            while (self.player.remaining_arrows > 0 and not(pq.empty())):
+                z = pq.pop()
+                arrows_to_shoot = min(z.health, self.player.remaining_arrows)
+                print(f'Shooting {arrows_to_shoot} arrows at zombie {z}')
+                z.suffer_arrows(arrows_to_shoot)
+                self.player.remaining_arrows -= arrows_to_shoot
             self.status = 'Round completed'
             return True
         else:
@@ -116,7 +126,7 @@ class Game:
         player_alive = True
         game_over = False
         while (player_alive and not(game_over)):
-            print(self.summary())
+            # print(self.summary())
             player_alive = self.play_round()
             game_over = self.prep_next_round()
         print(self.summary())
@@ -152,12 +162,13 @@ class Game:
             'max_rand_health': 25
         }
 
-        zombie_generator = RandomZombieGenerator(**random_zombie_config)
+        zombie_generator = Zombie_generator(**random_zombie_config)
+        priority_queue = Priority_queue()
 
         player1 = Player('Steve', quiver_capacity = 10)
         player2 = Player('Jimmy', quiver_capacity = 50)
         
-        game1 = Game(player = player1, named_zombies = [Zombie(*z) for z in zombie_inputs], zombie_generator = zombie_generator, max_rounds = 10)
+        game1 = Game(player = player1, named_zombies = [Zombie(*z) for z in zombie_inputs], zombie_generator = zombie_generator, priority_queue = priority_queue, max_rounds = 10)
         game2 = Game(player = player2, named_zombies = [Zombie(*z) for z in zombie_inputs], zombie_generator = zombie_generator, max_rounds = 10)
         
         print('PLAY GAME ONE ... Player = Steve, can shoot only 10 arrows per round ...\n\n')
