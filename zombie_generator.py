@@ -1,5 +1,7 @@
+import random
+from zombie import Zombie
 
-class RandomZombieGenerator:
+class Zombie_generator:
     '''Random zombie generation function calls
     std::string name  = P2random::getNextZombieName();    	
     uint32_t distance = P2random::getNextZombieDistance();    	
@@ -13,6 +15,12 @@ class RandomZombieGenerator:
         self.max_rand_health = max_rand_health
         self.Zacks = 0
         random.seed(random_seed)
+
+    def __call__(self):
+        '''Class is callable. Generates zombie inputs (in order) using the four helper functions.
+        '''
+        inputs = {'name': self.getNextZombieName(), 'distance': self.getNextZombieDistance(), 'speed': self.getNextZombieSpeed(), 'health': self.getNextZombieHealth()}    
+        return Zombie(**inputs)
     
     def getNextZombieName(self):
         self.Zacks += 1
@@ -27,22 +35,28 @@ class RandomZombieGenerator:
     def getNextZombieHealth(self):
         return random.randint(1, self.max_rand_health)
 
-
-@classmethod
-    def generate_random_zombie(cls, zombie_generator):
-        zombie_input = (
-            zombie_generator.getNextZombieName(),
-            zombie_generator.getNextZombieDistance(),
-            zombie_generator.getNextZombieSpeed(),
-            zombie_generator.getNextZombieHealth()
-        )
-        return Zombie(*zombie_input)
-
     @classmethod
-    def generate_random_Zack(cls):
-        '''TODO - make this random. Starting with simple, static constructor.
-        '''
-        cls.zack_count += 1
-        inputs = ('Zack ' + str(cls.zack_count), 100, 10, 50)
-        new_zombie = Zombie(*inputs)
-        return new_zombie
+    def TestMe(cls):
+        print(f'{'='*40}\nTesting class: {cls.__name__}\n{'='*40}')
+        gen1 = Zombie_generator(random_seed=42, max_rand_distance=100, max_rand_speed=30, max_rand_health=10)
+
+        print('Created a generator using this code ...')
+        print('Zombie_generator(random_seed=42, max_rand_distance=100, max_rand_speed=30, max_rand_health=10)\n')
+
+        zombie_list1 = [gen1() for i in range(5)]
+        print('List of random zombies ....')
+        for z in zombie_list1:
+            print(z)
+
+        gen2 = Zombie_generator(random_seed=42, max_rand_distance=100, max_rand_speed=30, max_rand_health=10)
+
+        zombie_list2 = [gen2() for i in range(5)]
+        print('\nSecond list ... should match first, using same random seed and params ...')
+        for z in zombie_list2:
+            print(z)
+
+def main():
+    Zombie_generator.TestMe()
+
+if __name__ == '__main__':
+    main()

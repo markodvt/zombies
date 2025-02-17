@@ -1,56 +1,9 @@
-from zombie import Zombie, RandomZombieGenerator
+from zombie import Zombie
+from zombie_generator import RandomZombieGenerator
+from player import Player
 
 '''A Game represewnts the state of a roster of Zombies and the state of the Player over a sequence of rounds.
 '''
-
-class Player:
-    '''Player has a name and arrow_capacity. 
-
-    TODO - implement strategy later so player can prioritize their arrows.
-    Prioritize shooting the zombie with the lowest ETA. You may shoot the same zombie with several arrows during a round, but do not continue to shoot a zombie that has been destroyed (i.e. after its health has reached zero).
-
-    In the event of ties in ETA, you should shoot the zombie with the lower health.
-    If zombies are also tied in health, you should shoot the zombie with the lexicographically smaller name.
-    '''
-    def __init__(self, name, quiver_capacity, zombie_queue=None, alive=True, entered_in_round = 1, killed_in_round = None, killed_by = None):
-        self.name = name
-        self.quiver_capacity = quiver_capacity
-        self.alive = True
-        self.entered_in_round = entered_in_round
-        self.killed_in_round = killed_in_round
-        self.killed_by = killed_by
-        self.remaining_arrows = 0
-        self.zombie_queue = zombie_queue
-        
-    def __repr__(self):
-        # return self.__class__.__name__ + str(self.__dict__)
-        print_keys = ('name', 'alive', 'quiver_capacity', 'killed_in_round', 'killed_by')
-        result = self.__class__.__name__ + '{' 
-        result += ', '.join(f'{k}: {self.__dict__[k]}' for k in print_keys)
-        result += '}'
-        return result
-
-    def killed(self, zombie, round=None):
-        if not(self.alive):
-            raise RuntimeError(f'Player {self.name} previously killed by {self.killed_by}; cannot be killed again by {zombie}.')
-        else:
-            self.alive = False
-            self.killed_by = zombie
-            self.killed_in_round = round
-
-    def update_zombie_queue(self, zombie_array):
-        '''Generate a priority queue based on updated attributes of the zombies in the zombie_array. This is used in a game, after the array game.zombies reflects new positions of the zombies.
-        
-        Begin with naiive implementation ... just return 0..len(array)
-        '''
-        self.zombie_gueue = list(range(len(zombie_array)))
-
-    def next_target_zombie(self):
-        '''Returns index (in zombie_array) of the most dangerous zombie, so player can aim available arrows at zombie_array[next_target_zombie()].
-        
-        Begin with naiive implementation ... just return next index.
-        '''
-        return self.zombie_gueue.pop(0)
 
 class Game:
     '''Game state includes a player (just one for now), a list of named_zombies, a current round (default to 1), and max_rounds (to prevent infinite games).
@@ -82,6 +35,9 @@ class Game:
         '''Display current state of the Game
         '''
         return self.__class__.__name__ + str(self.__dict__)
+
+    def generate_random_zombie(self):
+        return self.zombie_generator()
     
     def play_round(self):
         '''Implement this to orchestrate the actions in the round, then advance current_round by 1.
@@ -112,8 +68,8 @@ class Game:
             # Generate new zombies
             print(f'Generating two new zombies ... should be random, but starting with static.')
             for i in range(2):
-                # self.zombies.append(Zombie.generate_random_Zack())
-                self.zombies.append(Zombie.generate_random_zombie(self.zombie_generator))
+                z = self.generate_random_zombie()
+                self.zombies.append(z)
 
             # Shoot all arrows at most urgent zombies
             # TODO - implement real arrow logic.
