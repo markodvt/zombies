@@ -42,7 +42,12 @@ methods:
 - callable
 - helper functions getNextZombieName, etc.
 
-# Main (contains Game Class)
+## Priority_queue
+- push(item, priority)
+- pop()
+- empty() -> bool
+
+## Main (contains Game Class)
 data:
 - player
 - named_zombies (list)
@@ -57,3 +62,25 @@ methods:
 - prep_next_round
 - play_game
 - summary (to display game state)
+
+## How a Game runs ...
+
+Each round of the game:
+
+- advance the current_round by one
+- player refills their quiver to quiver_capacity
+- all existing (live) zombies advance, in order they entered the game; first one to reach player kills the player
+- new zombies appear at random (non-zero) distances
+- player shoots all arrows, prioritizing zombies closest to player; "closest" is measured as distance/speed (which zombies will reach player soonest) 
+
+At each round, move all zombies (even if player had been killed), as verbose mode prints the final positions at end of round, not at death of player.
+
+## Use of priority queue
+
+The game has an attribute zombies = a list of all zombies (living or dead) in the order they were created
+
+In each round, the game's zombies list is updated with new (generated) zombies
+
+After all live zombies advance, a new priority_que is created containing live zombies with their updated ETAs.
+
+The player empties their arrows based on the priority queue.
